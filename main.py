@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.params import Body
-from pydantic import BaseModel
+from pydantic import BaseModel 
 
 app = FastAPI()
 
@@ -18,16 +18,22 @@ def get_posts():
 # Note: Create post using body raw json from postman and use that post body as payload 
 # @app.post("/createPosts")
 # def create_post(payload: dict = Body(...)):
-    # print(f"New post title: {payload["title"]} and New post content: {payload["content"]}")
-    # return {"message" : "Your post was created"}
+#     print(f"New post title: {payload["title"]} and New post content: {payload["content"]}")
+#     return {"message" : "Your post was created"}
 
 
 # Import basemodel from pydantic to use schema for post body structure and validation
 
-class Posts(BaseModel):
+class Post(BaseModel):
     title: str
     content: str
+    published: bool = True
+    rating: int | None = None
 
 @app.post("/createPosts")
-def create_posts():
-    return {"message": "Posts created with schema validation"}
+def create_posts(new_post: Post):
+    print(new_post.published)
+    print(new_post.rating)
+    print(new_post.model_dump())
+    # print(new_post.published)
+    return {"your post has been created successfully"}
