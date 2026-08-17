@@ -1,8 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.params import Body
 from pydantic import BaseModel 
+from random import randrange
 
 app = FastAPI()
+
+my_posts = [{"title": "title of post 1", "content": "content of post1", "id": 1}, {"title": "favorite foods", "content": "burgers and pizza", "id": 2}]
 
 # request get Method url ("/")
 @app.get("/")
@@ -11,7 +14,7 @@ def root():
 
 @app.get("/posts")
 def get_posts():
-    return {"message" : "These are your posts"}
+    return {"data" : my_posts}
 
 
 
@@ -30,10 +33,44 @@ class Post(BaseModel):
     published: bool = True
     rating: int | None = None
 
-@app.post("/createPosts")
-def create_posts(new_post: Post):
-    print(new_post.published)
-    print(new_post.rating)
-    print(new_post.model_dump())
+@app.post("/posts", status_code = status.HTTP_201_CREATED)
+def create_posts(post: Post):
+    # print(post.published)
+    # print(post.rating)
+    # print(post.model_dump())
     # print(new_post.published)
-    return {"your post has been created successfully"}
+
+    post_dict = post.model_dump()
+    post_dict['id'] = randrange(0, 1000000)
+    my_posts.append(post_dict)
+
+    return {"data": post_dict}
+
+def find_post(id):
+    for p in my_posts:
+        if p["id"] == id:
+            return p
+
+#Note: Notice the /posts/latest is before /posts/{id}. It is working top down. Because of that reason if we put latest after /{id} it will not be validated as int and will not work.
+@app.get("/posts/latest")
+def get_latest_post():
+    latest_post = my_posts[my_posts.__len__() - 1]
+    print(latest_post)
+    return {"latest_post_detail": latest_post}
+
+
+
+@app.get("/posts/{id}")
+def get_post(id: int, response: Response):
+    print(type(id))
+    post = find_post(id)
+
+    # if not post:
+    #     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+    #                     detail = f"Post with id {id} was not found")
+
+    if not post:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"message": f"The post with id {id} was not found"}
+
+    return {"post_detail": post}
