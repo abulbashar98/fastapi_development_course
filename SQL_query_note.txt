@@ -1,0 +1,49 @@
+
+1. SELECT * FROM products;
+
+2. SELECT name, price, id FROM products;
+
+3. SELECT id AS products_id, price AS products_price From product
+
+4. SELECT * FROM products WHERE id = 22;
+5. SELECT name, price, on_sale FROM products WHERE id = 22;
+
+6. SELECT * FROM products WHERE inventory = 100;
+7. SELECT * FROM products WHERE name = 'TV';
+8. SELECT * FROM products WHERE inventory = 0;
+
+9. SELECT * FROM products WHERE inventory != 0;
+10. SELECT * FROM products WHERE inventory <> 0;
+
+11. SELECT * FROM products WHERE price >= 50;
+
+12. SELECT * FROM products WHERE price >= 20 AND inventory <> 0;
+13. SELECT * FROM products WHERE price <= 100 OR inventory = 0;
+
+14. SELECT * FROM products WHERE id = 1 OR id = 2 OR id = 3;
+15. SELECT * FROM products WHERE id IN (1,2,3);
+
+16. SELECT * FROM products WHERE name LIKE 'TV%';
+17. SELECT * FROM products WHERE name LIKE '%e'
+18. SELECT * FROM products WHERE name LIKE '%a%' AND id = 4;
+
+19. SELECT * FROM products WHERE name NOT LIKE '%e' AND inventory = 0;
+20. SELECT * FROM products WHERE name NOT LIKE '%a' AND price >= 20;
+
+21. SELECT * FROM products ORDER BY inventory DESC, price ASC;
+22. SELECT * FROM products WHERE price >= 100 ORDER BY created_at DESC 
+
+23. SELECT * FROM products LIMIT 5;
+24. SELECT * FROM products ORDER by id LIMIT 7;
+
+25. SELECT * FROM products ORDER BY id LIMIT 5 OFFSET 4;
+
+26. INSERT INTO products (name,price,inventory) VALUES ('cheese',4,30);
+27. INSERT INTO products (name,price,inventory) VALUES ('Laptop',350,15), ('charger',80,60), ('power-bank',25,60);
+
+28. INSERT INTO products (name,price,inventory) VALUES ('cable',12,200), ('memory-card',8,200) returning *;
+29. INSERT INTO products (name,price,inventory) VALUES ('listrine',10,15) returning name,created_at,id;
+
+30. DELETE FROM products WHERE id = 26 returning *;
+
+31. UPDATE products SET name = 'JBL' WHERE id = 27 returning *;

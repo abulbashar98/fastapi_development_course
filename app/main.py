@@ -25,7 +25,7 @@ def get_posts():
 #     return {"message" : "Your post was created"}
 
 
-# Import basemodel from pydantic to use schema for post body structure and validation
+# Import BaseModel from pydantic to use schema for post body structure and validation
 
 class Post(BaseModel):
     title: str
