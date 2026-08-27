@@ -7,6 +7,7 @@ import time
 from sqlalchemy.orm import Session
 from .database import engine,get_db
 from . import models,schemas
+from typing import List
 
 
 app = FastAPI()
@@ -37,7 +38,7 @@ def root():
 
 
 
-@app.get("/posts")
+@app.get("/posts" ,response_model = List[schemas.PostResponse])
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute("""SELECT * FROM posts;""")
     # posts = cursor.fetchall()
@@ -45,7 +46,7 @@ def get_posts(db: Session = Depends(get_db)):
 
     posts = db.query(models.Post).all()
 
-    return {"data" : posts}
+    return posts
 
 
 
