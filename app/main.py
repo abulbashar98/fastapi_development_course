@@ -1,13 +1,18 @@
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, status, Depends
 from fastapi.params import Body
 from pydantic import BaseModel 
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from sqlalchemy.orm import Session
+from .database import engine,get_db
+from . import models
 
 
 app = FastAPI()
+
+models.Base.metadata.create_all(bind=engine)
 
 while True:
     try:
@@ -29,11 +34,18 @@ my_posts = [{"title": "title of post 1", "content": "content of post1", "id": 1}
 def root():
     return {"message": "Hello World!"}
 
+@app.get("/sqlalchemy")
+def test_sqlalchemy(db: Session = Depends(get_db)):
+    posts = db.query(models.Post).all()
+    print(posts)
+    return {"data": posts}
+
+
 @app.get("/posts")
 def get_posts():
     cursor.execute("""SELECT * FROM posts;""")
     posts = cursor.fetchall()
-    print(posts)
+    # print(posts)
 
     return {"data" : posts}
 
