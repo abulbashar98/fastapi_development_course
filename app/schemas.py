@@ -9,7 +9,7 @@ class PostBase(BaseModel):
     published: bool = True
 
     class Config:
-            orm_mode = True
+            from_attributes = True
 
 
 class PostCreate(PostBase):
@@ -26,7 +26,7 @@ class UserCreate(BaseModel):
      password: str
 
      class Config:
-                 orm_mode = True
+                 from_attributes = True
 
 class UserResponse(BaseModel):
       email: EmailStr
