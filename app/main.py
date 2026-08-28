@@ -201,3 +201,15 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return new_user
+
+
+@app.get("/users/{id}", response_model=schemas.UserResponse)
+
+def get_user(id: int, response: Response,db: Session = Depends(get_db)):
+    user = db.query(models.Users).filter(models.Users.id == id).first()
+
+    if not user:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"message": f"User with id {id} was not found!"}
+
+    return user
