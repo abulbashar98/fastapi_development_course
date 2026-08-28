@@ -20,7 +20,7 @@ while True:
     try:
         conn = psycopg2.connect(host = "localhost", dbname = "Fastapi", user = "postgres", password = "password1234",cursor_factory=RealDictCursor)
         cursor = conn.cursor()
-        print("Database connected successfully!")
+        print("Database connected successfully!!")
         break
 
     except Exception as error:
@@ -183,3 +183,15 @@ def update_post(id: int,post: schemas.PostCreate,response: Response, db: Session
     db.commit()
 
     return post_query.first()
+
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model = schemas.UserResponse)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+
+    new_user = models.Users(**user.model_dump())
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return new_user
