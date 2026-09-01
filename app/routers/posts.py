@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, status, Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from ..database import engine,get_db
-from .. import models,schemas,utils
+from .. import models,schemas,utils,oAuth2
 from typing import List
 
 router = APIRouter(
@@ -11,7 +11,7 @@ router = APIRouter(
 
 
 @router.get("/" ,response_model = List[schemas.PostResponse])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
     # cursor.execute("""SELECT * FROM posts;""")
     # posts = cursor.fetchall()
     # # print(posts)
@@ -35,7 +35,7 @@ def get_posts(db: Session = Depends(get_db)):
   
 
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model=schemas.PostResponse)
-def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
     # print(post.published)
     # print(post.rating)
     # print(post.model_dump())
@@ -52,12 +52,15 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # print(**post.model_dump())
 
     # new_post = models.Post(title = post.title, content = post.content, published = post.published)
+
+    print(current_user)
+
     new_post = models.Post(**post.model_dump())
 
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-
+ 
 
     # return {"data": post_dict}
     return new_post
@@ -80,7 +83,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/{id}")
-def get_post(id: int, response: Response, db: Session = Depends(get_db)):
+def get_post(id: int, response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
     # print(type(id))
     # post = find_post(id)
 
@@ -110,7 +113,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db)):
 #             return i
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, response: Response, db: Session = Depends(get_db)):
+def delete_post(id: int, response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
     # index = find_post_index(id)
 
     # cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", (str(id),))
@@ -133,7 +136,7 @@ def delete_post(id: int, response: Response, db: Session = Depends(get_db)):
 
 
 @router.put("/{id}", response_model=schemas.PostResponse)
-def update_post(id: int,post: schemas.PostCreate,response: Response, db: Session = Depends(get_db)):
+def update_post(id: int,post: schemas.PostCreate,response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
     # index = find_post_index(id)
 
     # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",(post.title,post.content,post.published,(str(id))))

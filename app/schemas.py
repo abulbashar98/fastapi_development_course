@@ -19,6 +19,7 @@ class PostResponse(PostBase):
     pass
     id: int
     created_at: datetime
+    owner_id: int
 
 
 class UserCreate(BaseModel):
@@ -36,5 +37,12 @@ class UserResponse(BaseModel):
 class UserLogin(BaseModel):
       email: EmailStr
       password: str
+
+class Token(BaseModel):
+      access_token: str
+      token_type: str
+
+class TokenData(BaseModel):
+      id: int | None = None
 
 
