@@ -16,7 +16,11 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
     # posts = cursor.fetchall()
     # # print(posts)
 
-    posts = db.query(models.Post).all()
+    #For specific user on a private application
+    posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all()
+
+    if not posts:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Posts in this url made by user {current_user.id} does not exist!")
 
     return posts
 
@@ -55,7 +59,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
 
     print(current_user)
 
-    new_post = models.Post(**post.model_dump())
+    new_post = models.Post(owner_id = current_user.id, **post.model_dump())
 
     db.add(new_post)
     db.commit()
@@ -103,6 +107,9 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db),current_
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"message": f"The post with id {id} was not found"}
 
+    if post.owner_id != current_user.id:
+             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not authorized to access this post!")
+
     return post
 
 
@@ -127,6 +134,9 @@ def delete_post(id: int, response: Response, db: Session = Depends(get_db),curre
     if deletable_post == None:
             response.status_code = status.HTTP_404_NOT_FOUND
             return {"message": f"post with id {id} was not found"}
+
+    if current_user.id != deletable_post.owner_id:
+         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not authorized to delete this post")
 
     post_query.delete(synchronize_session = False)
     db.commit()
@@ -156,6 +166,9 @@ def update_post(id: int,post: schemas.PostCreate,response: Response, db: Session
     # print(post_dict)
     
     # return {"post": post}
+
+    if current_user.id != updatable_post.owner_id:
+         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not authorized to update this post")
 
     post_query.update(post.model_dump(), synchronize_session = False)
     db.commit()

@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, Boolean, TIMESTAMP, text,ForeignKey
-# from sqlalchemy.sql.sqltypes import Text
 from .database import Base
 
 
