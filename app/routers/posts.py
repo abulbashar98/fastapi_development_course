@@ -17,7 +17,7 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
     # # print(posts)
 
     #For specific user on a private application
-    posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id).all()
+    posts = db.query(models.Post).all()
 
     if not posts:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Posts in this url made by user {current_user.id} does not exist!")
@@ -107,8 +107,7 @@ def get_post(id: int, response: Response, db: Session = Depends(get_db),current_
         response.status_code = status.HTTP_404_NOT_FOUND
         return {"message": f"The post with id {id} was not found"}
 
-    if post.owner_id != current_user.id:
-             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not authorized to access this post!")
+   
 
     return post
 
