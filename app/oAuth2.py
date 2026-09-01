@@ -55,7 +55,7 @@ def get_current_user(token: str = Depends(oAuth2_scheme), db: Session = Depends(
     credential_exception = HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="invalid credential",headers={"WWW-Authenticate": "Bearer"})
 
     token = verify_access_token(token, credential_exception)
-    current_user = db.query(models.Users).filter(models.Users.id == token.id).first() 
+    current_user = db.query(models.User).filter(models.User.id == token.id).first() 
     
     return current_user
 
