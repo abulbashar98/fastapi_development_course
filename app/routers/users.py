@@ -1,8 +1,7 @@
-from fastapi import FastAPI, status, Depends, APIRouter, HTTPException
+from fastapi import status, Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
-from ..database import engine,get_db
+from ..database import get_db
 from .. import models,schemas,utils
-from typing import List
 from sqlalchemy.exc import IntegrityError
 
 router = APIRouter(

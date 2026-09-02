@@ -1,5 +1,4 @@
 from .database import engine
-from .database import Base
 from fastapi import FastAPI
 from . import models
 from .routers import posts, users, auth

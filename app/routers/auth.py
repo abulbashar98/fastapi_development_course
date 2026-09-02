@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status, Depends, APIRouter, HTTPException
+from fastapi import status, Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from .. import database, models, schemas, utils,oAuth2
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
