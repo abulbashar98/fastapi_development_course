@@ -4,13 +4,14 @@ from sqlalchemy.orm import sessionmaker
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from .config import settings
 
 
-# SQLALCHEMY_DATABASE_URL = "postgresql://<username>:<password>@<ip-address>/hostname"
+# SQLALCHEMY_DATABASE_URL = "postgresql://<username>:<password>@<ip-address>:<port>/database_name"
 
 # SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@localhost/database_name"
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password1234@localhost/Fastapi"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_ip_address}:{settings.database_port}/{settings.database_name}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
@@ -31,14 +32,14 @@ def get_db():
 
 
 
-while True:
-    try:
-        conn = psycopg2.connect(host = "localhost", dbname = "Fastapi", user = "postgres", password = "password1234",cursor_factory=RealDictCursor)
-        cursor = conn.cursor()
-        print("Database connected successfully!!")
-        break
+# while True:
+#     try:
+#         conn = psycopg2.connect(host = "localhost", dbname = "Fastapi", user = "postgres", password = "password1234",cursor_factory=RealDictCursor)
+#         cursor = conn.cursor()
+#         print("Database connected successfully!!")
+#         break
 
-    except Exception as error:
-        print("Database connection failed")
-        print("Error: ", error)
-        time.sleep(2)
+#     except Exception as error:
+#         print("Database connection failed")
+#         print("Error: ", error)
+#         time.sleep(2)
