@@ -11,13 +11,15 @@ router = APIRouter(
 
 
 @router.get("/" ,response_model = List[schemas.PostResponse])
-def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
+def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user), limit: int = 3, skip: int = 0, search: str | None = ""):
     # cursor.execute("""SELECT * FROM posts;""")
     # posts = cursor.fetchall()
     # # print(posts)
 
-    #For specific user on a private application
-    posts = db.query(models.Post).all()
+    print(search)
+    # #search%with%
+
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
     if not posts:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Posts in this url made by user {current_user.id} does not exist!")
