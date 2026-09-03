@@ -47,3 +47,13 @@
 30. DELETE FROM products WHERE id = 26 returning *;
 
 31. UPDATE products SET name = 'JBL' WHERE id = 27 returning *;
+
+32. SELECT * FROM posts LEFT JOIN votes ON posts.id = votes.post_id;
+33. SELECT id,title,created_at,post_id,user_id FROM posts LEFT JOIN votes ON posts.id = votes.post_id;
+
+34. SELECT id,title,created_at,post_id,user_id FROM posts RIGHT JOIN votes ON posts.id = votes.post_id;
+
+35. SELECT posts.id, COUNT(*) FROM posts LEFT JOIN votes ON posts.id = votes.post_id GROUP BY posts.id;
+
+36. SELECT posts.*, COUNT(votes.post_id) FROM posts LEFT JOIN votes ON posts.id = votes.post_id GROUP BY posts.id;
+
