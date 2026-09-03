@@ -16,11 +16,17 @@ class PostCreate(PostBase):
     pass
 
 class PostResponse(PostBase):
-    pass
     id: int
     created_at: datetime
     owner_id: int
     owner: UserResponse
+
+class PostResponse_with_left_outer_join(BaseModel):
+      Post: PostResponse
+      votes: int
+
+      class Config:
+                  from_attributes = True
 
 
 class UserCreate(BaseModel):

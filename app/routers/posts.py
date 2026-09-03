@@ -1,5 +1,8 @@
 from fastapi import Response, status, Depends, APIRouter, HTTPException
+
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+
 from ..database import get_db
 from .. import models,schemas,oAuth2
 from typing import List
@@ -10,7 +13,8 @@ router = APIRouter(
 )
 
 
-@router.get("/" ,response_model = List[schemas.PostResponse])
+# @router.get("/", response_model = List[schemas.PostResponse])
+@router.get("/", response_model = List[schemas.PostResponse_with_left_outer_join])
 def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user), limit: int = 3, skip: int = 0, search: str | None = ""):
     # cursor.execute("""SELECT * FROM posts;""")
     # posts = cursor.fetchall()
@@ -21,12 +25,21 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
     #search with
     
 
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id,isouter =True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    print(posts)
 
     if not posts:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Posts in this url made by user {current_user.id} does not exist!")
 
-    return posts
+    return [
+        {
+            "Post": post,
+            "votes": votes
+        }
+        for post, votes in posts
+    ]
 
 
 
@@ -40,7 +53,37 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
 # Import BaseModel from pydantic to use schema for post body structure and validation
 
 
-  
+@router.get("/{id}", response_model= schemas.PostResponse_with_left_outer_join)
+def get_post(id: int, response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
+    # print(type(id))
+    # post = find_post(id)
+
+    # if not post:
+    #     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+    #                     detail = f"Post with id {id} was not found")
+
+    # cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id)))
+    # post = cursor.fetchone()
+    # conn.commit()
+
+    post_query = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id,isouter =True).group_by(models.Post.id).filter(models.Post.id == id)
+
+    post = post_query.first()
+
+    if not post:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"message": f"The post with id {id} was not found"}
+
+   
+
+    return post
+
+
+
+# def find_post_index(id):
+#     for i, p in enumerate(my_posts):
+#         if p["id"] == id:
+#             return i
 
 @router.post("/", status_code = status.HTTP_201_CREATED, response_model=schemas.PostResponse)
 def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oAuth2.get_current_user)):
@@ -90,37 +133,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
 
 
 
-@router.get("/{id}")
-def get_post(id: int, response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
-    # print(type(id))
-    # post = find_post(id)
 
-    # if not post:
-    #     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
-    #                     detail = f"Post with id {id} was not found")
-
-    # cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id)))
-    # post = cursor.fetchone()
-    # conn.commit()
-
-    post_query = db.query(models.Post).filter(models.Post.id == id)
-
-    post = post_query.first()
-
-    if not post:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"message": f"The post with id {id} was not found"}
-
-   
-
-    return post
-
-
-
-# def find_post_index(id):
-#     for i, p in enumerate(my_posts):
-#         if p["id"] == id:
-#             return i
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int, response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
