@@ -13,6 +13,8 @@ class Post(Base):
     published = Column(Boolean, server_default = "TRUE", nullable = False )
     created_at = Column(TIMESTAMP(timezone=True), nullable=False,server_default=text("now()"))
     owner_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"), nullable = False)
+    phone_number = Column(String,nullable=False,) 
+    address = Column(String,nullable=False)
 
     owner = relationship("User")
 
