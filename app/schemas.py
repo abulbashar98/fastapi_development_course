@@ -2,6 +2,22 @@ from pydantic import BaseModel,EmailStr,conint
 from datetime import datetime
 
 
+class UserCreate(BaseModel):
+     email: EmailStr
+     password: str
+
+     class Config:
+                 from_attributes = True
+
+class UserResponse(BaseModel):
+      email: EmailStr
+      id: int
+      created_at: datetime
+
+class UserLogin(BaseModel):
+      email: EmailStr
+      password: str
+
 
 class PostBase(BaseModel):
     title: str
@@ -29,21 +45,7 @@ class PostResponse_with_left_outer_join(BaseModel):
                   from_attributes = True
 
 
-class UserCreate(BaseModel):
-     email: EmailStr
-     password: str
 
-     class Config:
-                 from_attributes = True
-
-class UserResponse(BaseModel):
-      email: EmailStr
-      id: int
-      created_at: datetime
-
-class UserLogin(BaseModel):
-      email: EmailStr
-      password: str
 
 class Token(BaseModel):
       access_token: str
