@@ -1,11 +1,9 @@
 from pydantic import BaseModel,EmailStr,conint
 from datetime import datetime
 
-
 class UserCreate(BaseModel):
      email: EmailStr
      password: str
-
      class Config:
                  from_attributes = True
 
@@ -14,22 +12,21 @@ class UserResponse(BaseModel):
       id: int
       created_at: datetime
 
+
 class UserLogin(BaseModel):
       email: EmailStr
       password: str
-
 
 class PostBase(BaseModel):
     title: str
     content: str
     published: bool = True
-
     class Config:
             from_attributes = True
 
-
 class PostCreate(PostBase):
     pass
+
 
 class PostResponse(PostBase):
     id: int
@@ -40,10 +37,8 @@ class PostResponse(PostBase):
 class PostResponse_with_left_outer_join(BaseModel):
       Post: PostResponse
       votes: int
-
       class Config:
                   from_attributes = True
-
 
 
 
@@ -57,5 +52,3 @@ class TokenData(BaseModel):
 class Vote(BaseModel):
       post_id: int
       dir: conint(ge=0,le=1)
-
-     
