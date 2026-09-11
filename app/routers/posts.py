@@ -31,7 +31,7 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
     print(posts)
 
     if not posts:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Posts in this url made by user {current_user.id} does not exist!")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Posts in this url made by user {current_user.id} does not exist currently!")
 
     return [
         {
