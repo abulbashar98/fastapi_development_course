@@ -1,0 +1,29 @@
+services:
+  api:
+    image: abulbashar98/fastapi
+    depends_on:
+      - postgres
+    ports:
+      - "80:8000"
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_IP_ADDRESS: ${DATABASE_IP_ADDRESS}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      SECRET_ACCESS_KEY: ${SECRET_ACCESS_KEY}
+      ALGORITHM: ${ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=password1234
+      - POSTGRES_DB=fastapi
+
+    volumes:
+      - postgres-db:/var/lib/postgresql
+
+volumes:
+  postgres-db:
