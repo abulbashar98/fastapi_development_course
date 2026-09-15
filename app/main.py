@@ -33,7 +33,7 @@ app.include_router(vote.router)
 # request get Method url ("/")
 @app.get("/")
 def root():
-    return {"message": "Hello World!"}
+    return {"message": "Just hello world from Rome Togliatti!"}
 
 
 
