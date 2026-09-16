@@ -10,7 +10,6 @@ def uninitialized_bank_account():
 def initialized_bank_account_with_hundred():
     return BankAccount(100)
 
-
 @pytest.mark.parametrize("num1, num2, expected", [
     (4,5,9),
     (12,5,17),

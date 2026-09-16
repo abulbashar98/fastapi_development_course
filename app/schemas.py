@@ -25,6 +25,8 @@ class PostBase(BaseModel):
             from_attributes = True
 
 class PostCreate(PostBase):
+    phone_number: str
+    address: str
     pass
 
 
@@ -40,6 +42,8 @@ class PostResponse_with_left_outer_join(BaseModel):
       class Config:
                   from_attributes = True
 
+class PostUpdate(PostBase):
+       pass
 
 
 class Token(BaseModel):

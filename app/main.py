@@ -1,5 +1,5 @@
 from .database import engine
-from fastapi import FastAPI
+from fastapi import FastAPI,status
 from . import models
 from .routers import posts, users, auth,vote
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,7 +33,7 @@ app.include_router(vote.router)
 # request get Method url ("/")
 @app.get("/")
 def root():
-    return {"message": "Just hello world from Togliatti Rome!"}
+    return {"message": "Hello World from Togliatti Rome!"}
 
 
 

@@ -27,7 +27,7 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
 
     # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
 
-    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id,isouter =True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id,isouter =True).group_by(models.Post.id).filter(models.Post.title.contains(search)).all()
     print(posts)
 
     if not posts:
@@ -162,7 +162,7 @@ def delete_post(id: int, response: Response, db: Session = Depends(get_db),curre
 
 
 @router.put("/{id}", response_model=schemas.PostResponse)
-def update_post(id: int,post: schemas.PostCreate,response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
+def update_post(id: int,post: schemas.PostUpdate,response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
     # index = find_post_index(id)
 
     # cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE id = %s RETURNING *""",(post.title,post.content,post.published,(str(id))))
