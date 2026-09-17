@@ -7,6 +7,33 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from app.database import get_db, Base
+import pytest
+
+
+@pytest.fixture
+def session():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    db = TestingsessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@pytest.fixture
+def client(session):
+    
+    def override_get_db():
+        try:
+            yield session
+        finally:
+            session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield TestClient(app)
+
+
 
 
 
@@ -16,30 +43,21 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 TestingsessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
 
-Base.metadata.create_all(bind=engine)
 
 
-def override_get_db():
-
-    db = TestingsessionLocal()
-
-    try:
-        yield db
-    finally:
-        db.close()
-
-app.dependency_overrides[get_db] = override_get_db
 
 
-client = TestClient(app)
 
-def test_root():
+
+
+def test_root(client, session):
+    session.query()
     res = client.get("/")
     print(res.json())
     assert res.json().get("message") == "Hello World from Togliatti Rome!"
     assert res.status_code == 200
 
-def test_create_user():
+def test_create_user(client):
     res = client.post("/users", json={"email" : "alamin@email.com", "password" : "password1234"})
 
     print(res.json())
