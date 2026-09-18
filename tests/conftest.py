@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from app.database import get_db, Base
 import pytest
-
+from app.oAuth2 import create_access_token
 
 @pytest.fixture()
 def session():
@@ -44,6 +44,20 @@ def test_user(client):
     assert res.status_code == 201
     return new_user
 
+@pytest.fixture
+def create_token(test_user):
+    token = create_access_token({"user_id": test_user['id']})
+    return token
+
+@pytest.fixture
+def authorized_client(create_token, client):
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {create_token}"
+    }
+
+    return client
+    
 
 
 
