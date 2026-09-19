@@ -52,6 +52,17 @@ def test_user(client):
     return new_user
 
 @pytest.fixture
+def test_user2(client):
+    user_data = {"email": "sandra@gmail.com", "password": "password123"}
+    res = client.post("/users", json=user_data)
+    # print(res.json())
+    new_user = res.json()
+    new_user['password'] = user_data['password']
+    # print(new_user)
+    assert res.status_code == 201
+    return new_user
+
+@pytest.fixture
 def create_token(test_user):
     token = create_access_token({"user_id": test_user['id']})
     return token
@@ -66,11 +77,12 @@ def authorized_client(create_token, client):
     return client
 
 @pytest.fixture
-def test_posts(session, test_user):
+def test_posts(session, test_user, test_user2):
     post_data = [
         {"title": "1st post title", "content": "1st post content", "owner_id": test_user['id'], "phone_number": "0123541515", "address": "Rome Termini"},
         {"title": "2nd post title", "content": "2nd post content", "owner_id": test_user['id'], "phone_number": "0123541515", "address": "Rome Termini"},
-        {"title": "3rd post title", "content": "3rd post content", "owner_id": test_user['id'], "phone_number": "0123541515", "address": "Rome Termini"}
+        {"title": "3rd post title", "content": "3rd post content", "owner_id": test_user['id'], "phone_number": "0123541515", "address": "Rome Termini"},
+        {"title": "4th post title", "content": "4th post content", "owner_id": test_user2['id'], "phone_number": "0123541515", "address": "malaga spain"}
     ]
 
     def create_post_model(post):

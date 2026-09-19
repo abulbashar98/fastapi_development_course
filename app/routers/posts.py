@@ -35,7 +35,7 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
 
     return [
         {
-            "Post": post,
+            "post": post,
             "votes": votes
         }
         for post, votes in posts
@@ -53,30 +53,39 @@ def get_posts(db: Session = Depends(get_db),current_user: int = Depends(oAuth2.g
 # Import BaseModel from pydantic to use schema for post body structure and validation
 
 
-@router.get("/{id}", response_model= schemas.PostResponse_with_left_outer_join)
-def get_post(id: int, response: Response, db: Session = Depends(get_db),current_user: int = Depends(oAuth2.get_current_user)):
-    # print(type(id))
-    # post = find_post(id)
+@router.get("/{id}", response_model=schemas.PostResponse_with_left_outer_join)
+def get_post(
+    id: int,
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: int = Depends(oAuth2.get_current_user)
+):
 
-    # if not post:
-    #     raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
-    #                     detail = f"Post with id {id} was not found")
-
-    # cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id)))
-    # post = cursor.fetchone()
-    # conn.commit()
-
-    post_query = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id,isouter =True).group_by(models.Post.id).filter(models.Post.id == id)
+    post_query = db.query(
+        models.Post,
+        func.count(models.Vote.post_id).label("votes")
+    ).join(
+        models.Vote,
+        models.Vote.post_id == models.Post.id,
+        isouter=True
+    ).group_by(
+        models.Post.id
+    ).filter(
+        models.Post.id == id
+    )
 
     post = post_query.first()
 
     if not post:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"message": f"The post with id {id} was not found"}
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The post with id {id} was not found"
+        )
 
-   
-
-    return post
+    return {
+        "post": post[0],
+        "votes": post[1]
+    }
 
 
 
@@ -190,3 +199,4 @@ def update_post(id: int,post: schemas.PostUpdate,response: Response, db: Session
     db.commit()
 
     return post_query.first()
+

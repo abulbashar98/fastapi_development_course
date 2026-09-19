@@ -28,16 +28,19 @@ class PostCreate(PostBase):
     phone_number: str
     address: str
     pass
-
+    class Config:
+            from_attributes = True
 
 class PostResponse(PostBase):
     id: int
     created_at: datetime
+    phone_number: str
+    address: str
     owner_id: int
     owner: UserResponse
 
 class PostResponse_with_left_outer_join(BaseModel):
-      Post: PostResponse
+      post: PostResponse
       votes: int
       class Config:
                   from_attributes = True
