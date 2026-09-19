@@ -8,6 +8,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from app.database import get_db, Base
 import pytest
 from app.oAuth2 import create_access_token
+from app import models
+
+SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_ip_address}:{settings.database_port}/{settings.database_name}_test"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+TestingsessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
 
 @pytest.fixture()
 def session():
@@ -57,15 +64,37 @@ def authorized_client(create_token, client):
     }
 
     return client
-    
+
+@pytest.fixture
+def test_posts(session, test_user):
+    post_data = [
+        {"title": "1st post title", "content": "1st post content", "owner_id": test_user['id'], "phone_number": "0123541515", "address": "Rome Termini"},
+        {"title": "2nd post title", "content": "2nd post content", "owner_id": test_user['id'], "phone_number": "0123541515", "address": "Rome Termini"},
+        {"title": "3rd post title", "content": "3rd post content", "owner_id": test_user['id'], "phone_number": "0123541515", "address": "Rome Termini"}
+    ]
+
+    def create_post_model(post):
+        return models.Post(**post)
+
+    # map(func, Iterable)s
+    post_map = map(create_post_model, post_data)
+    posts = list(post_map)
 
 
 
+    session.add_all(posts)
+    # session.add_all([
+    #     models.Post(title = "1st post title", content = "1st post content", owner_id = test_user['id']),
+    #     models.Post(title = "2nd post title", content = "2nd post title", owner_id = test_user['id']),
+    #     models.Post(title = "3rd post title", content = "3rd post content", owner_id = test_user['id'])
+    # ])
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_ip_address}:{settings.database_port}/{settings.database_name}_test"
+    session.commit()
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    posts = session.query(models.Post).all()
+    return posts
 
-TestingsessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
+
+
 
 
