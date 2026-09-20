@@ -17,9 +17,6 @@ jobs:
       - name: pull git repo
         uses: actions/checkout@v7
 
-      - name: say hello to sandra
-        run: echo "hello sandra"
-
       - name: install python 3.13
         uses: actions/setup-python@v7
         with:
@@ -30,6 +27,3 @@ jobs:
 
       - name: install all dependencies
         run: pip install -r requirements.txt
-
-      - name: run python script
-        run: python my_script.py
