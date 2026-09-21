@@ -33,7 +33,7 @@ app.include_router(vote.router)
 # request get Method url ("/")
 @app.get("/")
 def root():
-    return {"message": "Hello World from Togliatti Rome!"}
+    return {"message": "Hello World from Togliatti Rome! Trying to deploy in ubuntu vm using github actions."}
 
 
 
