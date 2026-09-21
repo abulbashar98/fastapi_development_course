@@ -98,13 +98,17 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
+
     needs: [build]
+
+    environment:
+      name: production
 
     steps:
       - name: deploying stuff
         run: echo "deploying some stuff"
 
-      - name: Deploy to ubuntu server
+      - name: Deploy to Ubuntu Server in Virtual Box
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.PROD_HOST }}
@@ -113,4 +117,4 @@ jobs:
           script: |
             cd app/app
             git pull --rebase origin main
-            echo ${{secrets.PROD_PASSWORD}} | sudo -S sytemctl restart api
+            echo ${{secrets.PROD_PASSWORD}} | sudo -S sytemctl restart fastapi.service
