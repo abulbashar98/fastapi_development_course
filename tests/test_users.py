@@ -10,7 +10,7 @@ def test_root(client, session):
     session.query()
     res = client.get("/")
     print(res.json())
-    assert res.json().get("message") == "Hello World from Togliatti Rome!"
+    assert res.json().get("message") == "Hello World from Togliatti Rome! Trying to deploy in ubuntu vm using github actions."
     assert res.status_code == 200
 
 def test_create_user(client):
