@@ -86,10 +86,6 @@ jobs:
         run: |
           sudo -S systemctl restart fastapi.service
 
-      - name: Check FastAPI service
-        run: |
-          sudo -S systemctl status fastapi.service --no-pager
-
       - name: Test FastAPI
         run: |
           curl --fail http://127.0.0.1:8000
