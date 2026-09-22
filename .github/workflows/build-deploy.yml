@@ -88,7 +88,7 @@ jobs:
 
       - name: Check FastAPI service
         run: |
-          echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl status fastapi.service --no-pager
+          sudo -S systemctl status fastapi.service --no-pager
 
       - name: Test FastAPI
         run: |
