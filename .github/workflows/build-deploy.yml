@@ -97,25 +97,49 @@ jobs:
       #   run: echo ${{ steps.docker_build.outputs.digest }}
 
   deploy:
-    runs-on: ubuntu-latest
+  runs-on: [self-hosted, linux, x64, fastapi-prod]
 
-    needs: [build]
+  needs: [build]
 
-    environment:
-      name: production
+  environment:
+    name: production
 
-    steps:
-      - name: deploying stuff
-        run: echo "deploying some stuff"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
 
-      - name: Deploy to Ubuntu Server Virtual Box port 22 host 10.0.2.15
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USERNAME }}
-          password: ${{ secrets.PROD_PASSWORD }}
-          port: ${{ secrets.PROD_PORT }}
-          script: |
-            cd app/app
-            git pull --rebase origin main
-            echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl restart fastapi.service
+    - name: Show deployment server
+      run: |
+        hostname
+        whoami
+        pwd
+
+    - name: Pull latest code
+      run: |
+        cd /home/fastapi-prod/app/app
+        git pull --rebase origin main
+
+    - name: Activate virtual environment
+      run: |
+        cd /home/fastapi-prod/app
+        source venv/bin/activate
+        python --version
+
+    - name: Install dependencies
+      run: |
+        cd /home/fastapi-prod/app
+        source venv/bin/activate
+        cd app
+        pip install -r requirements.txt
+
+    - name: Restart FastAPI
+      run: |
+        sudo systemctl restart fastapi.service
+
+    - name: Check FastAPI service
+      run: |
+        sudo systemctl status fastapi.service --no-pager
+
+    - name: Test FastAPI
+      run: |
+        curl --fail http://127.0.0.1:8000
