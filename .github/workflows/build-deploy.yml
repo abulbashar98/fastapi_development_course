@@ -1,25 +1,6 @@
 name: Build on Ubuntu-latest and Deploy on self-hosted
 
-# on:
-#   push:
-#     branches: ["main", "another_branch"]
-#   pull_request:
-#     branches:
-#       - "main"
-#       - "another_branch"
-
 on: [push, pull_request]
-
-#global scope for environment variable
-# env:
-#   DATABASE_USERNAME: postgres
-#   DATABASE_PASSWORD: password1234
-#   DATABASE_IP_ADDRESS: localhost
-#   DATABASE_PORT: 5432
-#   DATABASE_NAME: Fastapi
-#   SECRET_ACCESS_KEY: o9aLLhHKKfsFL451sliJHGafFla25fchUSD551aetFVSZR2sHF
-#   ALGORITHM: HS256
-#   ACCESS_TOKEN_EXPIRE_MINUTES: 30
 
 jobs:
   build:
@@ -41,6 +22,7 @@ jobs:
 
     environment:
       name: testing
+
     env:
       DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
       DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
@@ -52,94 +34,59 @@ jobs:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
 
     steps:
-      - name: pull git repo
+      - name: Pull git repo
         uses: actions/checkout@v7
 
-      - name: install python 3.13
+      - name: Install Python 3.13
         uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 
-      - name: update pip
+      - name: Update pip
         run: python -m pip install --upgrade pip
 
-      - name: install all dependencies from requiremnts.txt
+      - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: test with pytest
+      - name: Test with pytest
         run: |
           pip install pytest
           pytest -v
 
-      # - name: Login to DockerHub
-      #   uses: docker/login-action@v4
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      # - name: Set up Docker BuildX
-      #   id: buildx
-      #   uses: docker/setup-buildx-action@v4
-
-      # - name: Build and Push
-      #   id: docker_build
-      #   uses: docker/build-push-action@v7
-      #   with:
-      #     context: ./
-      #     file: ./Dockerfile
-      #     builder: ${{ steps.buildx.outputs.name }}
-      #     push: true
-      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/fastapi-actions:latest
-      #     cache-from: type=local,src=/tmp/.buildx-cache
-      #     cache-to: type=local,dest=/tmp/.buildx-cache
-
-      # - name: Image Digest
-      #   run: echo ${{ steps.docker_build.outputs.digest }}
-
   deploy:
-  runs-on: [self-hosted, linux, x64, fastapi-prod]
+    runs-on: [self-hosted, linux, x64, fastapi-prod]
 
-  needs: [build]
+    needs: [build]
 
-  environment:
-    name: production
+    environment:
+      name: production
 
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v7
+    steps:
+      - name: Show deployment server
+        run: |
+          hostname
+          whoami
+          pwd
 
-    - name: Show deployment server
-      run: |
-        hostname
-        whoami
-        pwd
+      - name: Pull latest code
+        run: |
+          cd /home/fastapi-prod/app
+          git pull --rebase origin main
 
-    - name: Pull latest code
-      run: |
-        cd /home/fastapi-prod/app/app
-        git pull --rebase origin main
+      - name: Install dependencies
+        run: |
+          cd /home/fastapi-prod/app
+          source venv/bin/activate
+          pip install -r requirements.txt
 
-    - name: Activate virtual environment
-      run: |
-        cd /home/fastapi-prod/app
-        source venv/bin/activate
-        python --version
+      - name: Restart FastAPI
+        run: |
+          sudo systemctl restart fastapi.service
 
-    - name: Install dependencies
-      run: |
-        cd /home/fastapi-prod/app
-        source venv/bin/activate
-        cd app
-        pip install -r requirements.txt
+      - name: Check FastAPI service
+        run: |
+          sudo systemctl status fastapi.service --no-pager
 
-    - name: Restart FastAPI
-      run: |
-        sudo systemctl restart fastapi.service
-
-    - name: Check FastAPI service
-      run: |
-        sudo systemctl status fastapi.service --no-pager
-
-    - name: Test FastAPI
-      run: |
-        curl --fail http://127.0.0.1:8000
+      - name: Test FastAPI
+        run: |
+          curl --fail http://127.0.0.1:8000
