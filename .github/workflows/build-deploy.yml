@@ -108,7 +108,7 @@ jobs:
       - name: deploying stuff
         run: echo "deploying some stuff"
 
-      - name: Deploy to Ubuntu Server in Virtual Box
+      - name: Deploy to Ubuntu Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.PROD_HOST }}
