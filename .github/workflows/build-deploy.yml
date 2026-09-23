@@ -88,13 +88,13 @@ jobs:
 
       - name: Check FastAPI service
         run: |
-          sudo systemctl status fastapi.service --no-pager
-          sudo systemctl is-active fastapi.service
+          sudo -S systemctl status fastapi.service --no-pager
+          sudo -S systemctl is-active fastapi.service
 
       - name: Show FastAPI logs, runner reloaded
         if: always()
         run: |
-          sudo journalctl -u fastapi.service -n 50 --no-pager
+          sudo -S journalctl -u fastapi.service -n 50 --no-pager
 
       - name: Test FastAPI
         run: |
