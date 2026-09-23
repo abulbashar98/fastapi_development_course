@@ -84,7 +84,7 @@ jobs:
 
       - name: Restart FastAPI
         run: |
-          sudo systemctl restart fastapi.service
+          sudo -S systemctl restart fastapi.service
 
       - name: Check FastAPI service
         run: |
