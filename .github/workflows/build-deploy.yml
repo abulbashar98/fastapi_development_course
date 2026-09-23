@@ -91,7 +91,7 @@ jobs:
           sudo systemctl status fastapi.service --no-pager
           sudo systemctl is-active fastapi.service
 
-      - name: Show FastAPI logs, runner
+      - name: Show FastAPI logs, runner reloaded
         if: always()
         run: |
           sudo journalctl -u fastapi.service -n 50 --no-pager
