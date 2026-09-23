@@ -88,7 +88,7 @@ jobs:
       PROD_PASSWORD: ${{secrets.PROD_PASSWORD}}
 
     steps:
-      - name: Show deployment server
+      - name: Show deployment server(optional)
         run: |
           hostname
           whoami
