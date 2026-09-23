@@ -88,13 +88,13 @@ jobs:
 
       - name: Check FastAPI service
         run: |
-          echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl status fastapi.service --no-pager
+          sudo -S systemctl status fastapi.service --no-pager
           echo ${{secrets.PROD_PASSWORD}} | sudo -S systemctl is-active fastapi.service
 
       - name: Show FastAPI logs, runner reloaded
         if: always()
         run: |
-          echo ${{secrets.PROD_PASSWORD}} | sudo -S journalctl -u fastapi.service -n 50 --no-pager
+          sudo -S journalctl -u fastapi.service -n 50 --no-pager
 
       - name: Test FastAPI
         run: |
