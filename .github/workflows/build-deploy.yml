@@ -82,10 +82,33 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Restart FastAPI
+       - name: Restart FastAPI
         run: |
-          sudo -S systemctl restart fastapi.service
+          sudo systemctl restart fastapi.service
+
+      - name: Check FastAPI service
+        run: |
+          sudo systemctl status fastapi.service --no-pager
+          sudo systemctl is-active fastapi.service
+
+      - name: Show FastAPI logs
+        if: always()
+        run: |
+          sudo journalctl -u fastapi.service -n 50 --no-pager
 
       - name: Test FastAPI
         run: |
-          curl --fail http://127.0.0.1:8000
+          for i in {1..10}; do
+
+            if curl --fail http://127.0.0.1:8000; then
+              echo "FastAPI is responding."
+              exit 0
+            fi
+
+            echo "FastAPI is not ready yet. Attempt $i/10..."
+            sleep 2
+
+          done
+
+          echo "FastAPI failed to start."
+          exit 1
